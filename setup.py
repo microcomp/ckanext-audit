@@ -24,7 +24,10 @@ setup(
     ],
     entry_points='''
         [ckan.plugins]
-        # Add plugins here, e.g.
-        myplugin=ckanext.audit.plugin:AuditPlugin
+        audit=ckanext.audit.plugin:AuditPlugin  
+        [paste.paster_command]
+        audit-cmd = ckanext.audit.audit_cmd:AuditCmd
+        [ckan.celery_task]
+        tasks = ckanext.audit.celery_import:task_imports
     ''',
 )
