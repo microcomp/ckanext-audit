@@ -1,9 +1,12 @@
 from ckan.model.meta import metadata, Session, mapper
 from sqlalchemy import types, Column, Table, ForeignKey
+from sqlalchemy.orm import relationship, backref
 from ckan.model import domain_object
+import ckan.model as model
 
 revision_audit_table = Table('revision_audit', metadata,
-                            Column('revision_id',  types.UnicodeText, ForeignKey('revision.id'), primary_key=True, nullable=False),
+                            #Column('revision_id',  types.UnicodeText, ForeignKey('revision.id'), primary_key=True, nullable=False),
+                            Column('revision_id',  types.UnicodeText, primary_key=True, nullable=False),
                             Column('actor_id', types.UnicodeText, nullable=False)
                         )
 
@@ -27,5 +30,7 @@ class RevisionAudit(domain_object.DomainObject):
         for i in query:
             Session.delete(i)
         return
-        
-mapper(RevisionAudit, revision_audit_table)
+
+mapper(RevisionAudit, revision_audit_table)        
+#mapper(RevisionAudit, revision_audit_table, properties={
+# "revision": relationship(model.Revision, single_parent=True, backref=backref('revision_audited', cascade="all, delete, delete-orphan"))})

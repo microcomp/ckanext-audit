@@ -8,6 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 def send_message_auditlog(context, data_dict):
+    jar_path = config.get('ckan.auditlog_enabled', True)
     log.info('audit log send')
     event_name = data_dict.get('event_name', '')
     authorized_user = data_dict.get('authorized_user', '')
@@ -35,6 +36,12 @@ def insert_revision_executor_id(context, data_dict):
     log.info('user_id: %s', user_id)
     log.info('revision_id: %s', revision_id)
     if user_id and revision_id:
+        search = {'revision_id' : revision_id}
+        revisions = RevisionAudit.get(**search)
+        if revisions:
+            revisions[0].actor_id = user_id
+            revisions[0].save()
+            return
         revision = RevisionAudit(revision_id, user_id)
         revision.save()
 
