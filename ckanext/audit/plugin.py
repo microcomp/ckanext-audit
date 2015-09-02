@@ -1,8 +1,10 @@
+import uuid
+
 import ckan.plugins as plugins
 from audit_db import RevisionAudit
 from ckan.lib.celery_app import celery
-from pylons import config
-import uuid
+from pylons import config, session
+import ckan.model as model
 
 import logging
 log = logging.getLogger(__name__)
@@ -19,6 +21,14 @@ def send_message_auditlog(context, data_dict):
     error_code = data_dict.get('error_code', 0)
     log.info('creating celery task')
     jar_path = config.get('ckan.auditlog_client_path', None)
+    if 'save' in dir(session):
+        actor_id = session.get('ckanext-cas-actorid', None)
+        actor_obj = model.User.get(actor_id)
+        if actor_obj:
+            authorized_user += '/' + actor_obj.fullname
+    subject_obj = model.User.get(subject)
+    if subject_obj:
+        subject += '/' + subject_obj.fullname
     celery.send_task("audit.log", args=[event_name, authorized_user, subject, description, object_reference, debug_level, error_code, jar_path], countdown=10, task_id=str(uuid.uuid4()))
 
 def retrieve_revision_executor(context, data_dict):
