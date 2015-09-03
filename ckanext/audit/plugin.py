@@ -21,11 +21,9 @@ def send_message_auditlog(context, data_dict):
     error_code = data_dict.get('error_code', 0)
     log.info('creating celery task')
     jar_path = config.get('ckan.auditlog_client_path', None)
-    if 'save' in dir(session):
-        actor_id = session.get('ckanext-cas-actorid', None)
-        actor_obj = model.User.get(actor_id)
-        if actor_obj:
-            authorized_user += '/' + actor_obj.fullname
+    actor_obj = model.User.get(authorized_user)
+    if actor_obj:
+        authorized_user += '/' + actor_obj.fullname
     subject_obj = model.User.get(subject)
     if subject_obj:
         subject += '/' + subject_obj.fullname
