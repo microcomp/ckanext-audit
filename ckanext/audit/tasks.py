@@ -14,7 +14,7 @@ def audit_log(event_name, authorized_user, subject, description, object_referenc
     log.info('jar path: %s', jar_path)
     log.info('jar path type: %s', type(jar_path))
     try:
-        status = subprocess.check_call(["java", "-jar", str(jar_path), str(event_name), str(authorized_user), str(subject), str(description), str(object_reference), str(debug_level), str(error_code)])
+        status = subprocess.check_call(["java", "-jar", str(jar_path), str(event_name), authorized_user.encode('utf-8'), subject.encode('utf-8'), str(description), str(object_reference), str(debug_level), str(error_code)])
         return status
     except subprocess.CalledProcessError as e:
         log.exception(e)
