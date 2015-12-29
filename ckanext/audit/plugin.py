@@ -22,10 +22,10 @@ def send_message_auditlog(context, data_dict):
     log.info('creating celery task')
     jar_path = config.get('ckan.auditlog_client_path', None)
     actor_obj = model.User.get(authorized_user)
-    if actor_obj:
+    if actor_obj and actor_obj.fullname:
         authorized_user += '/' + actor_obj.fullname
     subject_obj = model.User.get(subject)
-    if subject_obj:
+    if subject_obj and subject_obj.fullname:
         subject += '/' + subject_obj.fullname
     celery.send_task("audit.log", args=[event_name, authorized_user, subject, description, object_reference, debug_level, error_code, jar_path], countdown=10, task_id=str(uuid.uuid4()))
 
